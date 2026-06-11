@@ -65,7 +65,6 @@ The simulation returns:
 - `KD`: Derivative gain schedule over time
 - `t_array`: Time vector
 
-**Note**: The simulator assumes a two dimensional system state, where theta represents gyro angle while theta_dot represents angular velocity. 
 
 ## Control Algorithm
 
