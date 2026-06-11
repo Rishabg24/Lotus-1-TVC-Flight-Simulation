@@ -1,0 +1,37 @@
+{
+  "Rocket_1": {
+    "__comment_on_units__": "Everything uses standard kg and meters",
+    "F15": {
+      "designation": "F15",
+      "commonName": "F15",
+      "motorType": "SU",
+      "delays": [
+        0,
+        4,
+        6,
+        8
+      ],
+      "thrust": {
+        "average_N": 14.4,
+        "initial_N": 14.3,
+        "max_N": 25.3,
+        "total_impulse_Ns": 49.6,
+        "burn_time_s": 3.5,
+        "isp_s": 84,
+        "L_NOZZLE_CG": 0.052
+      }
+    },
+    "dimensions_weight": {
+      "diameter_m": 0.029,
+      "length_m": 0.114,
+      "total_weight_kg": 0.102,
+      "dry_mass": 0.034,
+      "propellant_weight": 0.06,
+      "mass_fraction": 0.59,
+      "dry_CG": 0.064,
+      "prop_CG": -0.021,
+      "airframe_mass_kg": 0.970,
+      "airframe_length_m": 0.407
+    }
+  }
+}
