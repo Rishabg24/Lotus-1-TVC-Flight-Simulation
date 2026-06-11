@@ -1,6 +1,6 @@
 # Self-Lander LQR Simulation
 
-A Python-based simulation for autonomous rocket landing control using Linear Quadratic Regulator (LQR) optimal control. This project models the dynamics of a small rocket during powered descent and computes optimal gimbal angles to maintain vertical stability.
+A Python-based simulation for controlling the Lotus 1 self landing TVC rocket using Linear Quadratic Regulator (LQR) optimal control. The simulation models the dynamics of a small rocket during powered descent and computes optimal gimbal angles to maintain vertical stability.
 
 ## Overview
 
@@ -60,10 +60,12 @@ trajectory, max_tilt, KD, t_array = sim(
 ```
 
 The simulation returns:
-- `trajectory`: State history [theta, theta_dot] over time
+- `trajectory`: State history [theta, theta_dot] over time.
 - `max_tilt`: Maximum tilt angle reached (radians)
 - `KD`: Derivative gain schedule over time
 - `t_array`: Time vector
+
+**Note**: The simulator assumes a two dimensional system state, where theta represents gyro angle while theta_dot represents angular velocity. 
 
 ## Control Algorithm
 
