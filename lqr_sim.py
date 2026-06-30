@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from utilities.read_config import data
+from utilities import mathematicals
 from utilities.mathematicals import Motor, Rocket
 from utilities.mathematicals import compute_LQR, precompute_plant_gains, dynamics, coasting_dynamics, compute_hoverslam,  RK4
 from utilities.barrowman_coeffs import compute_k_alpha, compute_total_cnalpha_and_cp
@@ -108,7 +109,8 @@ def sim(
 ):
     if motor is not None and rocket is not None:
         # Pre-compute plant gains once using vectorized operations (optimized for Monte Carlo)
-        time_array = motor.time_data
+        dt = 0.01
+        time_array = np.arange(0, motor.burn_time, dt)
         g_array = precompute_plant_gains(time_array, rocket, motor)
         g_scaled = g_array * thrust_scale * gain_scale / inertia_scale
 
@@ -123,6 +125,7 @@ def sim(
         Q = np.diag([100.0, 10.0])  # [theta penalty, theta_dot penalty]
         R = np.array([[1.0]])
 
+
         # Now iterate through timesteps using pre-computed gains
         for i in range(1, len(time_array)):
 
@@ -135,21 +138,23 @@ def sim(
             LQR_K = compute_LQR(g, Q, R)
             LQR_K_array[i] = LQR_K
 
-            h = time_array[i] - time_array[i - 1]  # always positive
-            y = RK4(dynamics, time_array[i - 1], x, h, LQR_K, g, motor, rocket, phase)
-
-            max_tilt = max(max_tilt, np.abs(y[0]))
-
-
-            x = np.array(
+            h = dt 
+            
+            x_measured = np.array(
                 [
-                    y[0] + np.random.normal(0, sigma_theta),
-                    y[1] + np.random.normal(0, sigma_omega),
-                    y[2],
-                    y[3]
+                    x[0] + np.random.normal(0, sigma_theta),
+                    x[1] + np.random.normal(0, sigma_omega),
+                    x[2],
+                    x[3]
                 ]
             )
-            trajectory[i] = y
+            y = RK4(dynamics, time_array[i-1], x, h, x_measured, LQR_K, g, motor, rocket, phase)
+
+            x = y
+
+            trajectory[i] = x
+
+            max_tilt = max(max_tilt, np.abs(y[0]))
 
         KD = LQR_K_array[:, 0, 1]  # Extract the derivative gain (K_d) for plotting
         KP = LQR_K_array[:, 0, 0]  # Extract the proportional gain (K_p) for plotting
@@ -232,14 +237,14 @@ def sim_wind(state, rocket=Lotus):
             theta_wind = np.arctan(wind_v / (v_current + 1e-3))
             theta_wind_final = theta_wind if abs(theta_wind) < np.deg2rad(90) else 0
 
-            k_alpha = compute_k_alpha(v_current, cg_nose, C_NA, C_P)
+            k_alpha, static_margin = compute_k_alpha(v_current, cg_nose, C_NA, C_P)
 
-            state = RK4(coasting_dynamics, t_current, state, dt, k_alpha, K_d, g, theta_wind_final, inertia)
 
-            hoverslam_altitude = compute_hoverslam(np.abs(state[3]),3.48) # computed using A_NET = (F_avg - airframe_mass) / g
+            state = RK4(coasting_dynamics, t_current, state, dt, None, k_alpha, K_d, g, theta_wind_final, inertia)
+
+            hoverslam_altitude = compute_hoverslam(np.abs(state[2]),3.48) # computed using A_NET = (F_avg - airframe_mass) / g
 
             max_tilt = max(max_tilt, np.abs(state[0]))
-            v_current = v_initial
 
         return state, max_tilt
     else:
@@ -297,6 +302,37 @@ def sim_wrapper(
 
 
 
+def single():
+    print(f"F15 burn time: {F15_A.burn_time} s")
+    print(f"F15 time array span: {F15_A.time_data[0]} to {F15_A.time_data[-1]} s")
+
+    single_trajectory, kp, kd, max_tilt = sim(
+    motor=F15_A,
+    rocket=Lotus,
+    inital_state=np.array([0.087, 0.0, 0.0, 0.0]),
+    thrust_scale=1.0,
+    gain_scale=1.0,
+    inertia_scale=1.0,
+    phase="powered",
+)
+
+    theta_deg = np.rad2deg(single_trajectory[:, 0])
+   
+    dt = 0.01
+    time_array = np.arange(0, F15_A.burn_time, dt)
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 9), sharex=True)
+    axes[0].plot(time_array, np.rad2deg(single_trajectory[:, 0]))
+    axes[0].set_ylabel("Theta (deg)")
+    axes[1].plot(time_array, kp, label="Kp")
+    axes[1].plot(time_array, kd, label="Kd")
+    axes[1].legend()
+    axes[1].set_ylabel("LQR Gains")
+    axes[2].plot(time_array, precompute_plant_gains(time_array, Lotus, F15_A))
+    axes[2].set_ylabel("Plant gain g(t)")
+    axes[2].set_xlabel("Time (s)")
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -355,6 +391,10 @@ if __name__ == "__main__":
     p95_max = np.percentile(max_tilts_deg, 95)
     p99_max = np.percentile(max_tilts_deg, 99)
     max_tilt_deg = np.max(max_tilts_deg)
+
+    #saturation debug:
+
+    print(f"# of times controller saturated 20 degree angle: {mathematicals.saturation_counter}")
 
     print(f"Kp Descent: {np.max(kp_descent_list)}\n Kd: {np.max(kd_descent_list)}")
     print(f"95th percentile final tilt: {p95_final:.2f}°")

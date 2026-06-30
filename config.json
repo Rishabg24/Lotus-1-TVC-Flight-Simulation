@@ -11,7 +11,7 @@
         "initial_N": 14.3,
         "max_N": 25.3,
         "total_impulse_Ns": 49.6,
-        "burn_time_s": 3.5,
+        "burn_time_s": 3.45,
         "isp_s": 84
       },
       "dry_mass": 0.034,
