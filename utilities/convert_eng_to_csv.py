@@ -1,7 +1,7 @@
 import csv
 
-eng_file_path = "Estes_F15.eng"
-csv_file_path = "motor_thrust_curve.csv"
+eng_file_path = "Estes_D12.eng"
+csv_file_path = "motor_thrust_curve_d12.csv"
 
 data_points = []
 

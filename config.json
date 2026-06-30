@@ -5,33 +5,42 @@
       "designation": "F15",
       "commonName": "F15",
       "motorType": "SU",
-      "delays": [
-        0,
-        4,
-        6,
-        8
-      ],
+      "delay": 0,
       "thrust": {
         "average_N": 14.4,
         "initial_N": 14.3,
         "max_N": 25.3,
         "total_impulse_Ns": 49.6,
         "burn_time_s": 3.5,
-        "isp_s": 84,
-        "L_NOZZLE_CG": 0.052
-      }
+        "isp_s": 84
+      },
+      "dry_mass": 0.034,
+      "prop_cg": -0.021,
+      "prop_mass": 0.06
+    },
+    "D12": {
+      "designation": "D12",
+      "commonName": "D12",
+      "motorType": "SU",
+      "delay": 0,
+      "thrust": {
+        "average_N": 10.2,
+        "initial_N": 13.4,
+        "max_N": 32.9,
+        "total_impulse_Ns": 20,
+        "burn_time_s": 1.6,
+        "isp_s": 81
+      },
+      "dry_mass": 0.024,
+      "prop_mass": 0.0238,
+      "prop_cg": 88889999999999999
     },
     "dimensions_weight": {
-      "diameter_m": 0.029,
-      "length_m": 0.114,
-      "total_weight_kg": 0.102,
-      "dry_mass": 0.034,
-      "propellant_weight": 0.06,
-      "mass_fraction": 0.59,
       "dry_CG": 0.064,
-      "prop_CG": -0.021,
-      "airframe_mass_kg": 0.970,
+      "airframe_mass_kg": 0.9533,
       "airframe_length_m": 0.407
-    }
+    },
+    "C_D":0.433,
+    "C_A":0.19
   }
 }
